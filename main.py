@@ -1,9 +1,39 @@
 import os
 import requests
-from fastapi import FastAPI
+from fastapi import FastAPI, __version__
+from fastapi.staticfiles import StaticFiles
+from fastapi.responses import HTMLResponse
+
 from dotenv import load_dotenv
 
 app = FastAPI()
+app.mount("/static", StaticFiles(directory="static"), name="static")
+
+html = f"""
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>FastAPI on Vercel</title>
+        <link rel="icon" href="/static/favicon.ico" type="image/x-icon" />
+    </head>
+    <body>
+        <div class="bg-gray-200 p-4 rounded-lg shadow-lg">
+            <h1>Mock up API for data services, build with FastAPI@{__version__}</h1>
+            <h2>Endpoints :</h2>
+            <ul>
+                <li><a href="/weather">weather</a></li>
+                <li><a href="/marine">marine</a></li>
+                <li><a href="/coal">coal</a></li>
+                <li><a href="/geopolitics">geopolitics</a></li>
+                <li><a href="/docs">/docs</a></li>
+                <li><a href="/redoc">/redoc</a></li>
+            </ul>
+            <p>Powered by <a href="https://vercel.com" target="_blank">Vercel</a></p>
+        </div>
+    </body>
+</html>
+"""
+
 load_dotenv()
 
 BASE_URL = os.environ["BASE_URL"]
@@ -68,7 +98,7 @@ mockupResponseTwo = {"hours":[{"airTemperature":{"noaa":28.29,"sg":28.29},"time"
 
 @app.get("/")
 async def root():
-    return message
+  return HTMLResponse(html)
 
 @app.get("/weather")
 async def weather(lat: str, lng: str):
