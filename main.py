@@ -15,20 +15,21 @@ html = f"""
     <head>
         <title>FastAPI on Vercel</title>
         <link rel="icon" href="/static/favicon.ico" type="image/x-icon" />
+        <script src="https://cdn.tailwindcss.com"></script>
     </head>
     <body>
-        <div class="bg-gray-200 p-4 rounded-lg shadow-lg">
-            <h1>Mock up API for data services, build with FastAPI@{__version__}</h1>
-            <h2>Endpoints :</h2>
-            <ul>
-                <li><a href="/weather">weather</a></li>
-                <li><a href="/marine">marine</a></li>
-                <li><a href="/coal">coal</a></li>
-                <li><a href="/geopolitics">geopolitics</a></li>
-                <li><a href="/docs">/docs</a></li>
-                <li><a href="/redoc">/redoc</a></li>
+        <div class="bg-gray-200 p-4 rounded-lg shadow-lg max-w-md mx-auto mt-10">
+            <h1 class="text-3xl bold mb-5">Mock up API for data services, build with FastAPI@{__version__}</h1>
+            <h2 class="my-2 text-xl">Endpoints :</h2>
+            <ul class="*:rounded-full *:border *:border-sky-100 *:bg-sky-50 *:px-2 *:py-0.5 *:underline *:w-sm" >
+                <li><a href="/weather" target="_blank">/weather</a></li>
+                <li><a href="/marine" target="_blank">/marine</a></li>
+                <li><a href="/coal" target="_blank">/coal</a></li>
+                <li><a href="/geopolitics" target="_blank">/geopolitics</a></li>
+                <li class="italic mt-2"><a href="/docs" target="_blank">/docs</a></li>
+                <li class="italic"><a href="/redoc" target="_blank">/redoc</a></li>
             </ul>
-            <p>Powered by <a href="https://vercel.com" target="_blank">Vercel</a></p>
+            <p class="mt-2 italic">Powered by <a class="underline text-blue-800" href="https://vercel.com" target="_blank">Vercel</a></p>
         </div>
     </body>
 </html>
