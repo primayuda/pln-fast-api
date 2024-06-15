@@ -92,10 +92,10 @@ mockupResponse = [
     },
     {
       "Date": "2022-11-14",
-      "Price": 89.80",
-      "Open": 89.80",
-      "High": 89.80",
-      "Low": 89.80",
+      "Price": 89.80,
+      "Open": 89.80,
+      "High": 89.80,
+      "Low": 89.80,
       "Vol.": null,
       "Change %": 0.00
     },
