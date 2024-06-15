@@ -14,6 +14,8 @@ longlat_bongkar = read_excel("longlat PLTU.xlsx", "Pel Bongkar")
 app = FastAPI()
 app.mount("/static", StaticFiles(directory="static"), name="static")
 
+currentTime = datetime.now()
+
 html = f"""
 <!DOCTYPE html>
 <html>
@@ -24,17 +26,22 @@ html = f"""
     </head>
     <body>
         <div class="bg-gray-200 p-4 rounded-lg shadow-lg max-w-md mx-auto mt-10">
-            <h1 class="text-3xl bold mb-5">Mock up API for data services, build with FastAPI@{__version__}</h1>
+            <h1 class="text-3xl bold mb-5">Mock up API untuk PLN Energi</h1>
+            <p class="italic">dibangun dengan FastAPI@{__version__}</p>
+            <h2 class="mt-2 text-2xl bold">Prompt Research</h2>
+            <h2 class="mt-2 text-2xl bold">Maintener :</h2>
+            <h2 class="mt-2 bold">Aditya, Rahmat Hidayat</h2>
             <h2 class="my-2 text-xl">Endpoints :</h2>
             <ul class="*:rounded-full *:border *:border-sky-100 *:bg-sky-50 *:px-2 *:py-0.5 *:underline *:w-sm" >
-                <li><a href="/weather" target="_blank">/weather</a></li>
-                <li><a href="/marine" target="_blank">/marine</a></li>
-                <li><a href="/coal" target="_blank">/coal</a></li>
-                <li><a href="/geopolitics" target="_blank">/geopolitics</a></li>
+                <li><a href="/cuaca" target="_blank">/Cuaca</a></li>
+                <li><a href="/gelombang" target="_blank">/Gelombang</a></li>
+                <li><a href="/batubara" target="_blank">/Batubara</a></li>
+                <li><a href="/geopol" target="_blank">/Geopolitik</a></li>
                 <li class="italic mt-2"><a href="/docs" target="_blank">/docs</a></li>
                 <li class="italic"><a href="/redoc" target="_blank">/redoc</a></li>
             </ul>
-            <p class="mt-2 italic">Powered by <a class="underline text-blue-800" href="https://vercel.com" target="_blank">Vercel</a></p>
+            <p class="mt-2">{currentTime}</p>
+            <p class="mt-2 italic">Hosting di <a class="underline text-blue-800" href="https://vercel.com" target="_blank">Vercel</a></p>
         </div>
     </body>
 </html>
@@ -69,7 +76,7 @@ mockupResponse = [
       "Open": 89.80,
       "High": 89.80,
       "Low": 89.80,
-      "Vol.": null,
+      "Vol.": "null",
       "Change %": 0.00
     },
     {
@@ -78,7 +85,7 @@ mockupResponse = [
       "Open": 89.80,
       "High": 89.80,
       "Low": 89.80,
-      "Vol.": null,
+      "Vol.": "null",
       "Change %": 0.00
     },
     {
@@ -87,16 +94,16 @@ mockupResponse = [
       "Open": 89.80,
       "High": 89.80,
       "Low": 89.80,
-      "Vol.": null,
+      "Vol.": "null",
       "Change %": 0.00
     },
     {
       "Date": "2022-11-14",
-      "Price": 89.80",
-      "Open": 89.80",
-      "High": 89.80",
-      "Low": 89.80",
-      "Vol.": null,
+      "Price": 89.80,
+      "Open": 89.80,
+      "High": 89.80,
+      "Low": 89.80,
+      "Vol.": "null",
       "Change %": 0.00
     },
 ]
@@ -109,9 +116,12 @@ async def root():
 
 @app.get("/cuaca")
 async def weather(idpelabuhan: str):
-    pel_muat = longlat_muat[longlat_muat['id_pelabuhan_muat'] == idpelabuhan][['latitude_pelabuhan_muat', 'longitude_pelabuhan_muat']]
-    lat = pel_muat['latitude_pelabuhan_muat']
-    lng =pel_muat['longitude_pelabuhan_muat']
+    # print(idpelabuhan)
+    pel_muat = longlat_muat[longlat_muat['id_pelabuhan_muat'] == float(idpelabuhan)][['latitude_pelabuhan_muat', 'longitude_pelabuhan_muat']]
+    # print(pel_muat)
+    lat = float(pel_muat['latitude_pelabuhan_muat'])
+    lng = float(pel_muat['longitude_pelabuhan_muat'])
+    # print(lat,lng)
     
     url = f'https://api.open-meteo.com/v1/forecast?latitude={lat}&longitude={lng}&daily=weather_code,temperature_2m_max,temperature_2m_min,rain_sum,wind_speed_10m_max&timezone=Asia%2FBangkok'
     # print(url)
