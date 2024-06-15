@@ -69,7 +69,7 @@ mockupResponse = [
       "Open": 89.80,
       "High": 89.80,
       "Low": 89.80,
-      "Vol.": null,
+      "Vol.": None,
       "Change %": 0.00
     },
     {
@@ -78,7 +78,7 @@ mockupResponse = [
       "Open": 89.80,
       "High": 89.80,
       "Low": 89.80,
-      "Vol.": null,
+      "Vol.": None,
       "Change %": 0.00
     },
     {
@@ -87,7 +87,7 @@ mockupResponse = [
       "Open": 89.80,
       "High": 89.80,
       "Low": 89.80,
-      "Vol.": null,
+      "Vol.": None,
       "Change %": 0.00
     },
     {
@@ -96,7 +96,7 @@ mockupResponse = [
       "Open": 89.80,
       "High": 89.80,
       "Low": 89.80,
-      "Vol.": null,
+      "Vol.": None,
       "Change %": 0.00
     },
 ]
@@ -109,9 +109,9 @@ async def root():
 
 @app.get("/cuaca")
 async def weather(idpelabuhan: str):
-    pel_muat = longlat_muat[longlat_muat['id_pelabuhan_muat'] == idpelabuhan][['latitude_pelabuhan_muat', 'longitude_pelabuhan_muat']]
-    lat = pel_muat['latitude_pelabuhan_muat']
-    lng =pel_muat['longitude_pelabuhan_muat']
+    pel_muat = longlat_muat[longlat_muat['id_pelabuhan_muat'] == float(idpelabuhan)][['latitude_pelabuhan_muat', 'longitude_pelabuhan_muat']]
+    lat = float(pel_muat['latitude_pelabuhan_muat'])
+    lng = float(pel_muat['longitude_pelabuhan_muat'])
     
     url = f'https://api.open-meteo.com/v1/forecast?latitude={lat}&longitude={lng}&daily=weather_code,temperature_2m_max,temperature_2m_min,rain_sum,wind_speed_10m_max&timezone=Asia%2FBangkok'
     # print(url)
