@@ -1,10 +1,15 @@
 import os
 import requests
+from pandas import read_excel
+from datetime import datetime
 from fastapi import FastAPI, __version__
 from fastapi.staticfiles import StaticFiles
 from fastapi.responses import HTMLResponse
 
 from dotenv import load_dotenv
+
+longlat_muat = read_excel("longlat PLTU.xlsx", "Pel Muat")
+longlat_bongkar = read_excel("longlat PLTU.xlsx", "Pel Bongkar")
 
 app = FastAPI()
 app.mount("/static", StaticFiles(directory="static"), name="static")
@@ -40,13 +45,14 @@ load_dotenv()
 BASE_URL = os.environ["BASE_URL"]
 
 message = {
-    'maintainer': 'Rahmat Hidayat',
-    'company': 'Prompt',
+    'time': datetime.now(),
+    'company': 'Prompt Research',
+    'maintainer': {'Aditya', 'Rahmat Hidayat'},
     'endpoint': {
-      'weather': f'{BASE_URL}/weather',
-      'marine': f'{BASE_URL}/marine',
-      'coal': f'{BASE_URL}/coal',
-      'geopolitics': f'{BASE_URL}/geopolitics',
+      'cuaca': f'{BASE_URL}/cuaca',
+      'gelombang': f'{BASE_URL}/gelombang',
+      'batubara': f'{BASE_URL}/batubara',
+      'geopol': f'{BASE_URL}/geopol',
     },
 }
 
@@ -58,40 +64,40 @@ mockupResponseOne = {
 
 mockupResponse = [
     {
-      "Date": "11/17/2022",
-      "Price": "89.80",
-      "Open": "89.80",
-      "High": "89.80",
-      "Low": "89.80",
-      "Vol.": "",
-      "Change %": "0.00%"
+      "Date": "2022-11-17",
+      "Price": 89.80,
+      "Open": 89.80,
+      "High": 89.80,
+      "Low": 89.80,
+      "Vol.": null,
+      "Change %": 0.00
     },
     {
-      "Date": "11/16/2022",
-      "Price": "89.80",
-      "Open": "89.80",
-      "High": "89.80",
-      "Low": "89.80",
-      "Vol.": "",
-      "Change %": "0.00%"
+      "Date": "2022-11-16",
+      "Price": 89.80,
+      "Open": 89.80,
+      "High": 89.80,
+      "Low": 89.80,
+      "Vol.": null,
+      "Change %": 0.00
     },
     {
-      "Date": "11/15/2022",
-      "Price": "89.80",
-      "Open": "89.80",
-      "High": "89.80",
-      "Low": "89.80",
-      "Vol.": "",
-      "Change %": "0.00%"
+      "Date": "2022-11-15",
+      "Price": 89.80,
+      "Open": 89.80,
+      "High": 89.80,
+      "Low": 89.80,
+      "Vol.": null,
+      "Change %": 0.00
     },
     {
-      "Date": "11/14/2022",
-      "Price": "89.80",
-      "Open": "89.80",
-      "High": "89.80",
-      "Low": "89.80",
-      "Vol.": "",
-      "Change %": "0.00%"
+      "Date": "2022-11-14",
+      "Price": 89.80",
+      "Open": 89.80",
+      "High": 89.80",
+      "Low": 89.80",
+      "Vol.": null,
+      "Change %": 0.00
     },
 ]
 
@@ -101,8 +107,12 @@ mockupResponseTwo = {"hours":[{"airTemperature":{"noaa":28.29,"sg":28.29},"time"
 async def root():
   return HTMLResponse(html)
 
-@app.get("/weather")
-async def weather(lat: str, lng: str):
+@app.get("/cuaca")
+async def weather(idpelabuhan: str):
+    pel_muat = longlat_muat[longlat_muat['id_pelabuhan_muat'] == idpelabuhan][['latitude_pelabuhan_muat', 'longitude_pelabuhan_muat']]
+    lat = pel_muat['latitude_pelabuhan_muat']
+    lng =pel_muat['longitude_pelabuhan_muat']
+    
     url = f'https://api.open-meteo.com/v1/forecast?latitude={lat}&longitude={lng}&daily=weather_code,temperature_2m_max,temperature_2m_min,rain_sum,wind_speed_10m_max&timezone=Asia%2FBangkok'
     # print(url)
     response = requests.get(url)
@@ -111,14 +121,14 @@ async def weather(lat: str, lng: str):
     else:
         return f'Error: {response.status_code}'
 
-@app.get("/marine")
+@app.get("/gelombang")
 async def marine(lat: str, lng: str):
     return mockupResponseTwo
 
-@app.get("/coal")
+@app.get("/batubara")
 async def coal():
     return mockupResponse
 
-@app.get("/geopolitics")
+@app.get("/geopol")
 async def geopolitics():
     return mockupResponseOne
