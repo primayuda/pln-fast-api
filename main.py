@@ -14,7 +14,9 @@ longlat_bongkar = read_excel("longlat PLTU.xlsx", "Pel Bongkar")
 app = FastAPI()
 app.mount("/static", StaticFiles(directory="static"), name="static")
 
-currentTime = datetime.now()
+current = datetime.now()
+currentDate = current.strftime("%d-%m-%Y %H:%M:%S")
+print(currentDate)
 
 html = f"""
 <!DOCTYPE html>
@@ -40,7 +42,7 @@ html = f"""
                 <li class="italic mt-2"><a href="/docs" target="_blank">/docs</a></li>
                 <li class="italic"><a href="/redoc" target="_blank">/redoc</a></li>
             </ul>
-            <p class="mt-2">{currentTime}</p>
+            <p class="mt-2">{currentDate}</p>
             <p class="mt-2 italic">Hosting di <a class="underline text-blue-800" href="https://vercel.com" target="_blank">Vercel</a></p>
         </div>
     </body>
@@ -117,6 +119,9 @@ async def root():
 @app.get("/cuaca")
 async def weather(idpelabuhan: str):
     # print(idpelabuhan)
+    # list_id = longlat_muat['id_pelabuhan_muat'].astype('string')
+    # print(list_id)
+    # print(list_id['id_pelabuhan_muat'].str.contains(idpelabuhan).any())
     pel_muat = longlat_muat[longlat_muat['id_pelabuhan_muat'] == float(idpelabuhan)][['latitude_pelabuhan_muat', 'longitude_pelabuhan_muat']]
     # print(pel_muat)
     lat = float(pel_muat['latitude_pelabuhan_muat'])
