@@ -1,17 +1,23 @@
 import os
 import requests
-from pandas import read_excel
+import arrow
+from pandas import read_excel, read_csv, to_datetime
 from datetime import datetime
 from fastapi import FastAPI, __version__
 from fastapi.staticfiles import StaticFiles
-from fastapi.responses import HTMLResponse
+from fastapi.responses import HTMLResponse, ORJSONResponse
 
 from dotenv import load_dotenv
 
 longlat_muat = read_excel("longlat PLTU.xlsx", "Pel Muat")
 longlat_bongkar = read_excel("longlat PLTU.xlsx", "Pel Bongkar")
 
-app = FastAPI()
+minerba = read_csv("minerba_date.csv")
+minerba['Bulan'] = to_datetime(minerba['Bulan'], format = '%Y-%m-%d')
+minerba['Komoditas'] = minerba['Komoditas'].astype('str')
+minerba = minerba[minerba['Komoditas'].str.startswith('Batubara')].drop(columns=['Komoditas'])
+
+app = FastAPI(default_response_class=ORJSONResponse)
 app.mount("/static", StaticFiles(directory="static"), name="static")
 
 current = datetime.now()
@@ -39,6 +45,7 @@ html = f"""
                 <li><a href="/gelombang" target="_blank">/Gelombang</a></li>
                 <li><a href="/batubara" target="_blank">/Batubara</a></li>
                 <li><a href="/geopol" target="_blank">/Geopolitik</a></li>
+                <li><a href="/pelabuhan" target="_blank">/Pelabuhan</a></li>
                 <li class="italic mt-2"><a href="/docs" target="_blank">/docs</a></li>
                 <li class="italic"><a href="/redoc" target="_blank">/redoc</a></li>
             </ul>
@@ -51,7 +58,10 @@ html = f"""
 
 load_dotenv()
 
+STORMGLASS_API_KEY = os.environ["STORMGLASS_API_KEY"]
 BASE_URL = os.environ["BASE_URL"]
+
+# print(STORMGLASS_API_KEY)
 
 message = {
     'time': datetime.now(),
@@ -67,8 +77,8 @@ message = {
 
 mockupResponseOne = {
   'data': [
-    {'region_id': "000", 'date': "2024-06-24", 'index': "78.6"}, 
-    {'region_id': "001", 'date': "2024-06-24", 'index': "20.6"}, 
+    {'region_id': "000", 'date': "2024-06-24", 'index': 78.6}, 
+    {'region_id': "001", 'date': "2024-06-24", 'index': 20.6}, 
 ]}
 
 mockupResponse = [
@@ -78,7 +88,7 @@ mockupResponse = [
       "Open": 89.80,
       "High": 89.80,
       "Low": 89.80,
-      "Vol.": "null",
+      "Vol.": None,
       "Change %": 0.00
     },
     {
@@ -87,7 +97,7 @@ mockupResponse = [
       "Open": 89.80,
       "High": 89.80,
       "Low": 89.80,
-      "Vol.": "null",
+      "Vol.": None,
       "Change %": 0.00
     },
     {
@@ -96,7 +106,7 @@ mockupResponse = [
       "Open": 89.80,
       "High": 89.80,
       "Low": 89.80,
-      "Vol.": "null",
+      "Vol.": None,
       "Change %": 0.00
     },
     {
@@ -105,7 +115,7 @@ mockupResponse = [
       "Open": 89.80,
       "High": 89.80,
       "Low": 89.80,
-      "Vol.": "null",
+      "Vol.": None,
       "Change %": 0.00
     },
 ]
@@ -117,33 +127,75 @@ async def root():
   return HTMLResponse(html)
 
 @app.get("/cuaca")
-async def weather(idpelabuhan: str):
-    # print(idpelabuhan)
-    # list_id = longlat_muat['id_pelabuhan_muat'].astype('string')
-    # print(list_id)
-    # print(list_id['id_pelabuhan_muat'].str.contains(idpelabuhan).any())
-    pel_muat = longlat_muat[longlat_muat['id_pelabuhan_muat'] == float(idpelabuhan)][['latitude_pelabuhan_muat', 'longitude_pelabuhan_muat']]
-    # print(pel_muat)
-    lat = float(pel_muat['latitude_pelabuhan_muat'])
-    lng = float(pel_muat['longitude_pelabuhan_muat'])
-    # print(lat,lng)
+async def cuaca(idpelabuhan: str):
+    # idpelabuhan = 3
+    pel_muat = longlat_muat[longlat_muat['id_pelabuhan_muat'] == int(idpelabuhan)].reset_index()
+    pel_muat = pel_muat[['nama_pelabuhan_muat', 'latitude_pelabuhan_muat', 'longitude_pelabuhan_muat']].to_dict(orient='index')
+    lat = pel_muat[0]['latitude_pelabuhan_muat']
+    lng = pel_muat[0]['longitude_pelabuhan_muat']
+    nmpelabuhan = pel_muat[0]['nama_pelabuhan_muat']
     
     url = f'https://api.open-meteo.com/v1/forecast?latitude={lat}&longitude={lng}&daily=weather_code,temperature_2m_max,temperature_2m_min,rain_sum,wind_speed_10m_max&timezone=Asia%2FBangkok'
     # print(url)
     response = requests.get(url)
     if response.status_code == 200:
-        return response.json()
+        rjson = response.json()
+        pelabuhan = {'idpelabuhan' : int(idpelabuhan), 'nama_pelabuhan' : nmpelabuhan} 
+        pelabuhan.update(rjson)
+        return pelabuhan
     else:
         return f'Error: {response.status_code}'
 
 @app.get("/gelombang")
-async def marine(lat: str, lng: str):
-    return mockupResponseTwo
+async def gelombang(idpelabuhan: str):
+  # idpelabuhan = 1
+  pel_muat = longlat_muat[longlat_muat['id_pelabuhan_muat'] == int(idpelabuhan)].reset_index(drop=True)
+  pel_muat = pel_muat[['nama_pelabuhan_muat', 'latitude_pelabuhan_muat', 'longitude_pelabuhan_muat']].to_dict(orient='index')
+  lat = pel_muat[0]['latitude_pelabuhan_muat']
+  lng = pel_muat[0]['longitude_pelabuhan_muat']
+  nmpelabuhan = pel_muat[0]['nama_pelabuhan_muat']
+    
+  # Get first hour of today
+  start = arrow.now().floor('day')
+  
+  # Get last hour of today
+  end = arrow.now().ceil('day')
+  response = requests.get(
+    'https://api.stormglass.io/v2/weather/point',
+    params = {
+      'lat': lat,
+      'lng': lng, 
+      # 'source' : ["noaa", "sg"],
+      'params': ','.join(['waveHeight', 'airTemperature']),
+      'start': start.to('UTC').timestamp(),  # Convert to UTC timestamp
+      'end': end.to('UTC').timestamp()  # Convert to UTC timestamp
+    },
+    headers = {
+      'Authorization': STORMGLASS_API_KEY
+      }
+  )
+
+  # Do something with response data.
+  json_data = response.json()
+  
+  pelabuhan = {'idpelabuhan' : int(idpelabuhan), 'nama_pelabuhan' : nmpelabuhan} 
+  pelabuhan.update(json_data)
+  return pelabuhan
+
 
 @app.get("/batubara")
-async def coal():
-    return mockupResponse
+async def batubara():
+    return minerba.to_dict(orient='index')
 
 @app.get("/geopol")
-async def geopolitics():
+async def geopolitik():
     return mockupResponseOne
+
+@app.get("/pelabuhan")
+async def pelabuhan(nama=None):
+    if nama is None:
+        data = longlat_muat.sort_values(by=['nama_pelabuhan_muat']).reset_index(drop=True)
+    else:
+        data = longlat_muat[longlat_muat['nama_pelabuhan_muat'].str.contains(nama, case=False, na=False)].sort_values(by=['nama_pelabuhan_muat']).reset_index(drop=True)
+    return data.to_dict(orient='index')
+
