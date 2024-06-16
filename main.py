@@ -56,7 +56,10 @@ html = f"""
 
 load_dotenv()
 
+STORMGLASS_API_KEY = os.environ["STORMGLASS_API_KEY"]
 BASE_URL = os.environ["BASE_URL"]
+
+# print(STORMGLASS_API_KEY)
 
 message = {
     'time': datetime.now(),
@@ -166,7 +169,7 @@ async def gelombang(idpelabuhan: str):
       'end': end.to('UTC').timestamp()  # Convert to UTC timestamp
     },
     headers = {
-      'Authorization': 'd94949ba-2b12-11ef-9acf-0242ac130004-d9494a5a-2b12-11ef-9acf-0242ac130004'
+      'Authorization': STORMGLASS_API_KEY
       }
   )
 
