@@ -75,11 +75,11 @@ message = {
     },
 }
 
-mockupResponseOne = {
-  'data': [
-    {'region_id': "000", 'date': "2024-06-24", 'index': 78.6}, 
-    {'region_id': "001", 'date': "2024-06-24", 'index': 20.6}, 
-]}
+mockupResponseOne = [
+    {'region_id': "000", 'region': "Indonesia", 'date': "2024-06-19", 'gpr_index': 78.6}, 
+    {'region_id': "001", 'region': "Jakarta", 'date': "2024-06-19", 'gpr_index': 90.2}, 
+    {'region_id': "904", 'region': "Papua Barat", 'date': "2024-06-19", 'gpr_index': 25.3} 
+]
 
 mockupResponse = [
     {
